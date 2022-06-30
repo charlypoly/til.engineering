@@ -1,0 +1,39 @@
+---
+title: Node.js packaging (continued) and problem solving
+date: 30/06/2022
+slug: 30-06-2022
+---
+
+
+## Node.js packaging (continued) and problem solving
+
+_30/06/2022_
+
+<br/>
+
+### Node.js packaging/bundling
+
+- after many hours struggling finalizing a Nest GraphQL driver facing the following error
+
+```bash
+[Nest] 87712  - 28/06/2022, 17:24:55   ERROR [ExceptionHandler] Nest can't resolve dependencies of the YogaDriver. Please make sure that the "graphQlFactory" property is available in the current context.
+
+Potential solutions:
+- If GraphQLFactory is a provider, is it part of the current GraphQLModule?
+- If GraphQLFactory is exported from a separate @Module, is that module imported within GraphQLModule?
+  @Module({
+    imports: [ /* the Module containing GraphQLFactory */ ]
+  })
+```
+
+The issue was related to mismatch of `@nest/*` dependencies.
+
+**Lessons:** 
+
+- **working with multiple packages setup is complicated, accurate versions are important.**
+- Remind to pay more attention at dependencies versions, double check warnings and compatibility.
+
+### Facing hard problems
+
+- Nest Plugin issues
+    - try/hard with no good understanding of the rules (here: dependency management) is frustrating and not a good way to proceed for me

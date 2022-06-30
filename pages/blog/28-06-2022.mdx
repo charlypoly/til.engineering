@@ -1,0 +1,28 @@
+---
+title: Ruby threads and node.js packaging
+date: 28/06/2022
+slug: 28-06-2022
+---
+
+
+## Ruby threads and node.js packaging
+
+_28/06/2022_
+
+<br />
+
+### Ruby
+
+- Threads: learned that Ruby treats class variable with a reference to the value, making it thread-safe to pass a class variable value to a `Queue` consumed by a `Thread`
+
+### Node.js packaging/bundling
+
+- Faced challenges into properly build a new Node.js package using our internal `bob` builder tool
+    - Digged into `lerna` code and other similar tool to understand the structure expected in a published package
+        - *TODO*
+
+
+### k6
+
+- Had the opportunity to invest some time in setuping a proper k6 config to do stress and performance benchmark
+    - Learnings: k6 is pretty cool and straighforward, however it would require more time to achieve more advanced use-cases
