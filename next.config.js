@@ -4,6 +4,7 @@ module.exports = nextra('./components/layout.js')({
   experimental: {
     turboMode: true,
   },
+  // unstable_faviconGlyph: '💡',
   images: {
     domains: ['pbs.twimg.com', 'abs.twimg.com'],
   },
