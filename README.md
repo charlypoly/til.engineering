@@ -1,11 +1,5 @@
-# Nextra Blank Custom Theme/Boilerplate Example
+# 💡 [TIL.engineering](https://til.engineering/)
 
-A nearly blank MDX blog/content site powered by a custom [Nextra](https://nextra.vercel.app) theme (see `components/layout.js`) w/Tailwind already setup. 
+Today I learned ("TIL") helps me better transition from years in tech lead positions to currently moving to an OSS engineer role and, I hope, will help some of you realize that we all continue learning along the way, at all levels.
 
-The post list for the blog index in `pages/index.js` comes out of `./posts.json`. If you wanted to get the Nextra page map to use on the index page, you _could_ make a blank `pages/index.mdx` and move that "page" component into `components/layout` (just check for `route === '/'`) and render it).
-
-Anyways, hopes this helps. Nextra rocks for static content. 
-
-
-
-
+More on [https://til.engineering](https://til.engineering/)
