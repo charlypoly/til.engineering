@@ -21,6 +21,14 @@ export default function Home({ posts }) {
             <li key={p.slug} className="flex items-center space-x-3">
               <span className="block text-gray-500 w-[9.5rem] text-right">
                 {p.dateStr}
+                {p.dateEndStr ? (
+                  <>
+                    <br />
+                    {' ↓ '}
+                    <br />
+                    {p.dateEndStr}
+                  </>
+                ) : null}
               </span>
               <Link href={`/blog/${p.slug}`}>
                 <a className="block font-bold">{p.title}</a>
@@ -59,9 +67,10 @@ export async function getStaticProps() {
                       title: content.data.title,
                       slug: content.data.slug,
                       dateStr: content.data.date,
+                      dateEndStr: content.data.dateEnd || null,
                       date:
                         parse(
-                          content.data.date,
+                          content.data.dateEnd || content.data.date,
                           'dd/MM/yyyy',
                           new Date()
                         ).getTime() / 1000,
