@@ -1,0 +1,102 @@
+---
+title: "GitHub automation: a small journey"
+date: 18/07/2022
+slug: 18-07-2022
+---
+
+
+## GitHub Automation: a small bot journey
+
+_18/07/2022_
+
+<br/>
+
+**TLDR;**
+- Some things seem faster than expected (_build an interactive bot for GitHub to Notion sync is easy with [Probot](https://probot.github.io/)_)
+- Some others require more work (_creating a GH App that is mentionable with a custom user (like [`@typescript-bot`](https://github.com/typescript-bot)) requires most work_)
+
+<br/>
+
+As mentioned in the [issue 01-07-2022](https://til.engineering/blog/01-07-2022), we, at [The Guild](https://www.the-guild.dev), aim to be better at sharing knowledge publicly.
+In this process, [Dotan](https://github.com/dotansimha) already created a Notion app that helps us syncing Notion Pages with GitHub Discussions: [the-guild-org/notion-github-sync](https://github.com/the-guild-org/notion-github-sync).
+
+### Scaling our newsletter writing process
+
+With the same goal in mind, [we started our monthly newsletter](https://www.getrevue.co/profile/TheGuild/).
+However, the current process of writing the newsletter is quite cumbersome; we need to ask everybody to go over all the things that happened in the last 30 days and might be worth showcasing.
+
+For this reason, I suggested creating a GitHub bot to help us collect information from our many repositories.
+
+
+
+Using [Revue.co](getrevue.co), we could have stuck to their Chrome extension, but it didn't fit for two main reasons:
+- we are stuck on the Revue invitations system not allowing us to invite more than one person (bug)
+- we aim to have multiple bots (GH, Slack, and more) that would allow us to gather content for multiple mediums (newsletter, blog, tweets)
+
+
+I end up laying down the following spec:
+- the bot should be callable from GH Issues and Pull Requests
+- the bot should help tag content for newsletter, blog, tweet, and content backlog
+- the bot should support quoting a comment
+
+![/18-07-2022-bot-issue.png](/18-07-2022-bot-issue.png)
+
+
+
+### The bot stack research
+
+Before jumping to implementation, I looked if the projects that initially inspired this idea ([`@typescript-bot`](https://github.com/typescript-bot) or Renovate) were open-source.
+
+After small searches, I remembered about [GitHub's Probot](https://probot.github.io/) library and started evaluating the fit for our bot's specs.
+
+[Probot](https://probot.github.io/) is easy to set up, with a scaffolding CLI tool and an auto-install mechanism that correctly sets up your GitHub App secrets for you: https://probot.github.io/docs/development/#configuring-a-github-app.
+
+Once set up, listening for issues and PR comments was straightforward: https://github.com/the-guild-org/content-bot/blob/main/src/index.ts#L154-L161
+
+### The `@theguild-content-bot` PoC
+
+Once The Guild content app was correctly set up and received issues, and PRs comments updates, implementing the business logic of pushing the data to Notion was straightforward.
+
+When a comment containing `/theguild <action>` is created by a Guild member, the issue or comment is extracted and [pushed to a Notion database](https://developers.notion.com/docs/working-with-page-content) (table):
+
+![/18-07-2022-content-database.png](/18-07-2022-content-database.png)
+
+
+If the action type is "newsletter", the next issue name is fetched [from Revue API](https://www.getrevue.co/api#get-/v2/issues/current) (_"NewsletterIssue"_ column).
+
+Once the PoC was ready, I looked at inspiration to deploy it to Vercel Functions ([probot/example-vercel](https://github.com/probot/example-vercel)) and deployed it (which required creating a dedicated production GH App).
+
+
+### Challenges and learnings
+
+**Challenges**
+
+Implementing the GH comments to Notion lifecycle was fast to implement and deploy (less than half a day).
+
+However, the ideal goal was to make the bot mentionable from GH issues and PRs for a better UX (like [`@typescript-bot`](https://github.com/typescript-bot) and Renovate do).
+
+I find out that achieving such behavior is an undocumented approach and requires the "bot user" to be a contributor to each repository.
+
+Contrary to [`@typescript-bot`](https://github.com/typescript-bot) and Renovate, our bot is not creating PR or commits, requiring us to invite it as a contributor to each repo.
+
+Sadly, a GitHub App cannot invite collaborators using its token [adding collaborators not being part of the allowed "server-to-server" actions of the GH API](https://docs.github.com/en/developers/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps#user-to-server-requests).
+Doing so requires setting up a ["Web application flow"](https://docs.github.com/en/developers/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps#web-application-flow) that would grant us the right to doing "user-to-server" actions using the user token, which means:
+1. implementing an OAuth workflow, which Probot does not support out of the box
+2. store and refresh users tokens (introducing changes in our Serverless setup)
+
+For this reason, our bot will stick to `/theguild newsletter` commands instead of nicer `@theguild-content-bot newsletter` mentions.
+
+Finally, The Guild Content GitHub app, as configured and currently deployed, can only be used by The Guild members (otherwise, everybody will start to update our Notion database).
+
+I find out very hard to find documentation on how to restrict GitHub app installation using Probot and fallback to a user allowlist at the app level.
+
+**Learnings**
+
+This one-day journey in the world of GitHub apps development taught me that simple automation is pretty easy to set up.
+Like the [TypeScript Core Team on the TypeScript repository](https://github.com/microsoft/TypeScript/wiki/Triggering-TypeScript-Bot), we aim to better automate our workflow by leveraging bots to help reproduce bugs and gather content.
+
+On the other hand, there is no cheap success, and setting up an advanced bot workflow requires a more advanced setup with a complete OAuth workflow and good user token management.
+
+--
+
+[the-guild-org/content-bot](https://github.com/the-guild-org/content-bot) is fully open-source and ready to be used and deployed as your own private GH App if you are interested in a GitHub to Notion tool 🤖
