@@ -8,15 +8,14 @@ const components = {};
 export default function Blog(props) {
   const { meta, route, ...rest } = props;
 
-  console.log(props);
-
   const sharedHead = (
     <Head>
+      <title>{meta.title}</title>
       <meta property="og:title" content={meta.title} />
-      <meta property="og:site_name" content="Jared Palmer's blog" />
+      <meta property="og:site_name" content="til.engineering" />
       <meta property="og:description" content={meta.description} />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content="@jaredpalmer" />
+      <meta name="twitter:site" content="@whereischarly" />
       <meta property="og:image" content={meta.og} />
     </Head>
   );

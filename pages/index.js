@@ -54,13 +54,11 @@ export async function getStaticProps() {
         if (err) {
           reject(err);
         } else {
-          console.log('files', files);
           resolve({
             props: {
               posts: files
                 .map((f) => {
                   const raw = fs.readFileSync(f);
-                  console.log('raw', raw.toString());
                   const content = meta(raw);
                   if (content.data.title && content.data.date) {
                     return {
